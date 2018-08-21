@@ -192,7 +192,7 @@ describe.only('matchOrders', () => {
         });
         */
 
-        it.only('Jacobs Example', async () => {
+        it('Jacobs Example', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
                 makerAddress: makerAddressLeft,
