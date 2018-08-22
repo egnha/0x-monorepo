@@ -93,7 +93,38 @@ contract LibMath is
         if (remainder == 0) {
             return false; // No rounding error.
         }
-
+        
+        uint256 errPercentageTimes1000000 = safeDiv(
+            safeMul(remainder, 1000000),
+            safeMul(numerator, target)
+        );
+        isError = errPercentageTimes1000000 > 1000;
+        return isError;
+    }
+    
+    /// @dev Checks if rounding error > 0.1%.
+    /// @param numerator Numerator.
+    /// @param denominator Denominator.
+    /// @param target Value to multiply with numerator/denominator.
+    /// @return Rounding error is present.
+    function isRoundingErrorCeil(
+        uint256 numerator,
+        uint256 denominator,
+        uint256 target
+    )
+        internal
+        pure
+        returns (bool isError)
+    {
+        // The remainder is the rounding error when floored
+        uint256 remainder = mulmod(target, numerator, denominator);
+        
+        // The error when rounding up is 
+        uint256 error = safeSub(denominator, remainder);
+        if (remainder == 0) {
+            return false; // No rounding error.
+        }
+        
         uint256 errPercentageTimes1000000 = safeDiv(
             safeMul(remainder, 1000000),
             safeMul(numerator, target)
