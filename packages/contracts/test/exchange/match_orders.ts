@@ -193,7 +193,7 @@ describe.only('matchOrders', () => {
         });
         */
 
-        it.only('Jacobs Example', async () => {
+        it('Jacobs Example', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
                 makerAddress: makerAddressLeft,
@@ -224,8 +224,6 @@ describe.only('matchOrders', () => {
                 feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 18), // 100%
                 feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 17), // 50%
             };
-            const expectedEndStateLeft = OrderStatus.FILLABLE;
-            const expectedEndStateRight = OrderStatus.FULLY_FILLED;
             // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -233,47 +231,9 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts,
-                expectedEndStateLeft,
-                expectedEndStateRight
+                expectedTransferAmounts
             );
         });
-        
-
-        /*
-        it.only('Jacobs Example', async () => {
-            // Create orders to match
-            const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
-                makerAddress: makerAddressLeft,
-                makerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 0),
-                takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 0),
-                feeRecipientAddress: feeRecipientAddressLeft,
-            });
-            const signedOrderRight = await orderFactoryRight.newSignedOrderAsync({
-                makerAddress: makerAddressRight,
-                makerAssetData: assetDataUtils.encodeERC20AssetData(defaultERC20TakerAssetAddress),
-                takerAssetData: assetDataUtils.encodeERC20AssetData(defaultERC20MakerAssetAddress),
-                makerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 0),
-                takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 0),
-                feeRecipientAddress: feeRecipientAddressRight,
-            });
-            // Match signedOrderLeft with signedOrderRight
-            await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
-                signedOrderLeft,
-                signedOrderRight,
-                takerAddress,
-                erc20BalancesByOwner,
-                erc721TokenIdsByOwner,
-            );
-         //   // Verify left order was fully filled
-          //  const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-         //   expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was fully filled
-         //   const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-         //   expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-        });*/
-
-        /*
 
         it('should transfer the correct amounts when orders completely fill each other', async () => {
             // Create orders to match
@@ -292,21 +252,30 @@ describe.only('matchOrders', () => {
                 feeRecipientAddress: feeRecipientAddressRight,
             });
             // Match signedOrderLeft with signedOrderRight
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was fully filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
         });
-
+        
         it('should transfer the correct amounts when orders completely fill each other and taker doesnt take a profit', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -323,35 +292,32 @@ describe.only('matchOrders', () => {
                 takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
                 feeRecipientAddress: feeRecipientAddressRight,
             });
-            // Store original taker balance
-            const takerInitialBalances = _.cloneDeep(erc20BalancesByOwner[takerAddress][defaultERC20MakerAssetAddress]);
             // Match signedOrderLeft with signedOrderRight
-            let newERC20BalancesByOwner: ERC20BalancesByOwner;
-            let newERC721TokenIdsByOwner: ERC721TokenIdsByOwner;
-            // prettier-ignore
-            [
-                newERC20BalancesByOwner,
-                // tslint:disable-next-line:trailing-comma
-                newERC721TokenIdsByOwner
-            ] = await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(0), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
+            // Match signedOrderLeft with signedOrderRight
+            await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-            );
-            // Verify left order was fully filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify taker did not take a profit
-            expect(takerInitialBalances).to.be.deep.equal(
-                newERC20BalancesByOwner[takerAddress][defaultERC20MakerAssetAddress],
+                expectedTransferAmounts
             );
         });
-
+        
         it('should transfer the correct amounts when left order is completely filled and right order is partially filled', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -368,22 +334,32 @@ describe.only('matchOrders', () => {
                 takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(4), 18),
                 feeRecipientAddress: feeRecipientAddressRight,
             });
-            // Match orders
+            // Match signedOrderLeft with signedOrderRight
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 16), // 50%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 40%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 16), // 100%
+            };
+            // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was fully filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was partially filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FILLABLE);
         });
-
+        
         it('should transfer the correct amounts when right order is completely filled and left order is partially filled', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -400,20 +376,30 @@ describe.only('matchOrders', () => {
                 takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
                 feeRecipientAddress: feeRecipientAddressRight,
             });
-            // Match orders
+            // Match signedOrderLeft with signedOrderRight
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 10%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+            };
+            // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was partially filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FILLABLE);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
         });
 
         it('should transfer the correct amounts when consecutive calls are used to completely fill the left order', async () => {
@@ -435,6 +421,20 @@ describe.only('matchOrders', () => {
             // Match orders
             let newERC20BalancesByOwner: ERC20BalancesByOwner;
             let newERC721TokenIdsByOwner: ERC721TokenIdsByOwner;
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 10%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+            };
             // prettier-ignore
             [
                 newERC20BalancesByOwner,
@@ -446,13 +446,8 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was partially filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FILLABLE);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
             // Construct second right order
             // Note: This order needs makerAssetAmount=90/takerAssetAmount=[anything <= 45] to fully fill the right order.
             //       However, we use 100/50 to ensure a partial fill as we want to go down the "left fill"
@@ -465,26 +460,37 @@ describe.only('matchOrders', () => {
                 takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 18),
                 feeRecipientAddress: feeRecipientAddressRight,
             });
+            
             // Match signedOrderLeft with signedOrderRight2
             const leftTakerAssetFilledAmount = signedOrderRight.makerAssetAmount;
             const rightTakerAssetFilledAmount = new BigNumber(0);
+            const expectedTransferAmounts2 = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(45), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(90), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(90), 16), // 90% (10% paid earlier)
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(90), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(45), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(90), 16), // 90%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(0), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(90), 16), // 90% (10% paid earlier)
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(90), 16), // 90%
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight2,
                 takerAddress,
                 newERC20BalancesByOwner,
-                erc721TokenIdsByOwner,
+                newERC721TokenIdsByOwner,
+                expectedTransferAmounts2,
                 leftTakerAssetFilledAmount,
-                rightTakerAssetFilledAmount,
+                rightTakerAssetFilledAmount
             );
-            // Verify left order was fully filled
-            const leftOrderInfo2: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo2.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify second right order was partially filled
-            const rightOrderInfo2: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight2);
-            expect(rightOrderInfo2.orderStatus as OrderStatus).to.be.equal(OrderStatus.FILLABLE);
         });
 
+        
         it('should transfer the correct amounts when consecutive calls are used to completely fill the right order', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -505,6 +511,20 @@ describe.only('matchOrders', () => {
             // Match orders
             let newERC20BalancesByOwner: ERC20BalancesByOwner;
             let newERC721TokenIdsByOwner: ERC721TokenIdsByOwner;
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(4), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(4), 16), // 4%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(6), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(4), 16), // 4%
+            };
             // prettier-ignore
             [
                 newERC20BalancesByOwner,
@@ -516,13 +536,9 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was partially filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FILLABLE);
+            
             // Create second left order
             // Note: This order needs makerAssetAmount=96/takerAssetAmount=48 to fully fill the right order.
             //       However, we use 100/50 to ensure a partial fill as we want to go down the "right fill"
@@ -539,23 +555,58 @@ describe.only('matchOrders', () => {
                 erc20BalancesByOwner[takerAddress][defaultERC20MakerAssetAddress],
             );
             const rightTakerAssetFilledAmount = signedOrderLeft.makerAssetAmount.minus(takerAmountReceived);
+            const expectedTransferAmounts2 = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(96), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(48), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(96), 16), // 96%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(48), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(96), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(96), 16), // 96%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(0), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(96), 16), // 96%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(96), 16), // 96%
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft2,
                 signedOrderRight,
                 takerAddress,
                 newERC20BalancesByOwner,
-                erc721TokenIdsByOwner,
+                newERC721TokenIdsByOwner,
+                expectedTransferAmounts2,
                 leftTakerAssetFilledAmount,
                 rightTakerAssetFilledAmount,
             );
-            // Verify second left order was partially filled
-            const leftOrderInfo2: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft2);
-            expect(leftOrderInfo2.orderStatus as OrderStatus).to.be.equal(OrderStatus.FILLABLE);
-            // Verify right order was fully filled
-            const rightOrderInfo2: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo2.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
         });
+        
+  /*
+            // Match signedOrderLeft with signedOrderRight
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 10%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 50%
+            };
+            await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
+                signedOrderLeft,
+                signedOrderRight,
+                takerAddress,
+                erc20BalancesByOwner,
+                erc721TokenIdsByOwner,
+                expectedTransferAmounts
+            );
 
+        */
         it('should transfer the correct amounts if fee recipient is the same across both matched orders', async () => {
             const feeRecipientAddress = feeRecipientAddressLeft;
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -573,12 +624,27 @@ describe.only('matchOrders', () => {
                 feeRecipientAddress,
             });
             // Match orders
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
         });
 
@@ -600,12 +666,27 @@ describe.only('matchOrders', () => {
             });
             // Match orders
             takerAddress = signedOrderLeft.makerAddress;
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
         });
 
@@ -627,12 +708,27 @@ describe.only('matchOrders', () => {
             });
             // Match orders
             takerAddress = signedOrderRight.makerAddress;
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
         });
 
@@ -654,12 +750,27 @@ describe.only('matchOrders', () => {
             });
             // Match orders
             takerAddress = feeRecipientAddressLeft;
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
         });
 
@@ -681,12 +792,27 @@ describe.only('matchOrders', () => {
             });
             // Match orders
             takerAddress = feeRecipientAddressRight;
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
         });
 
@@ -707,12 +833,27 @@ describe.only('matchOrders', () => {
                 feeRecipientAddress: makerAddressRight,
             });
             // Match orders
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
         });
 
@@ -861,22 +1002,31 @@ describe.only('matchOrders', () => {
                 feeRecipientAddress: feeRecipientAddressRight,
             });
             // Match orders
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 0),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 0),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(0), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was fully filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
         });
 
-        it('should transfer correct amounts when right order maker asset is an ERC721 token', async () => {
+        it.only('should transfer correct amounts when right order maker asset is an ERC721 token', async () => {
             // Create orders to match
             const erc721TokenToTransfer = erc721RightMakerAssetIds[0];
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -892,23 +1042,32 @@ describe.only('matchOrders', () => {
                 makerAssetData: assetDataUtils.encodeERC721AssetData(defaultERC721AssetAddress, erc721TokenToTransfer),
                 takerAssetData: assetDataUtils.encodeERC20AssetData(defaultERC20MakerAssetAddress),
                 makerAssetAmount: new BigNumber(1),
-                takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(8), 18),
                 feeRecipientAddress: feeRecipientAddressRight,
             });
             // Match orders
+            const expectedTransferAmounts = {
+                // Left Maker
+                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 18),
+                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 0),
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Right Maker
+                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 0),
+                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(8), 18),
+                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                // Taker
+                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+            };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
                 signedOrderRight,
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
+                expectedTransferAmounts
             );
-            // Verify left order was fully filled
-            const leftOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderLeft);
-            expect(leftOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-            // Verify right order was fully filled
-            const rightOrderInfo: OrderInfo = await exchangeWrapper.getOrderInfoAsync(signedOrderRight);
-            expect(rightOrderInfo.orderStatus as OrderStatus).to.be.equal(OrderStatus.FULLY_FILLED);
-        });*/
+        });
     });
 }); // tslint:disable-line:max-file-line-count
