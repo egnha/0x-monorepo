@@ -3,7 +3,6 @@ import { assetDataUtils } from '@0xproject/order-utils';
 import { RevertReason } from '@0xproject/types';
 import { BigNumber } from '@0xproject/utils';
 import { Web3Wrapper } from '@0xproject/web3-wrapper';
-import * as chai from 'chai';
 import * as _ from 'lodash';
 
 import { DummyERC20TokenContract } from '../../generated_contract_wrappers/dummy_erc20_token';
@@ -13,19 +12,15 @@ import { ERC721ProxyContract } from '../../generated_contract_wrappers/erc721_pr
 import { ExchangeContract } from '../../generated_contract_wrappers/exchange';
 import { artifacts } from '../utils/artifacts';
 import { expectTransactionFailedAsync } from '../utils/assertions';
-import { chaiSetup } from '../utils/chai_setup';
 import { constants } from '../utils/constants';
 import { ERC20Wrapper } from '../utils/erc20_wrapper';
 import { ERC721Wrapper } from '../utils/erc721_wrapper';
 import { ExchangeWrapper } from '../utils/exchange_wrapper';
 import { MatchOrderTester } from '../utils/match_order_tester';
 import { OrderFactory } from '../utils/order_factory';
-import { ERC20BalancesByOwner, ERC721TokenIdsByOwner, OrderInfo, TransferAmountsByMatchOrders as TransferAmounts, OrderStatus } from '../utils/types';
+import { ERC20BalancesByOwner, ERC721TokenIdsByOwner } from '../utils/types';
 import { provider, txDefaults, web3Wrapper } from '../utils/web3_wrapper';
 
-chaiSetup.configure();
-
-const expect = chai.expect;
 const blockchainLifecycle = new BlockchainLifecycle(web3Wrapper);
 
 describe.only('matchOrders', () => {
@@ -157,7 +152,6 @@ describe.only('matchOrders', () => {
             erc20BalancesByOwner = await erc20Wrapper.getBalancesAsync();
             erc721TokenIdsByOwner = await erc721Wrapper.getBalancesAsync();
         });
-        
 
         /*
         it.only('should transfer the correct amounts when orders completely fill each other', async () => {
@@ -231,7 +225,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -272,10 +266,10 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
-        
+
         it('should transfer the correct amounts when orders completely fill each other and taker doesnt take a profit', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -314,10 +308,10 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
-        
+
         it('should transfer the correct amounts when left order is completely filled and right order is partially filled', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -356,10 +350,10 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
-        
+
         it('should transfer the correct amounts when right order is completely filled and left order is partially filled', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -398,7 +392,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -446,7 +440,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
             // Construct second right order
             // Note: This order needs makerAssetAmount=90/takerAssetAmount=[anything <= 45] to fully fill the right order.
@@ -460,7 +454,6 @@ describe.only('matchOrders', () => {
                 takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 18),
                 feeRecipientAddress: feeRecipientAddressRight,
             });
-            
             // Match signedOrderLeft with signedOrderRight2
             const leftTakerAssetFilledAmount = signedOrderRight.makerAssetAmount;
             const rightTakerAssetFilledAmount = new BigNumber(0);
@@ -486,11 +479,10 @@ describe.only('matchOrders', () => {
                 newERC721TokenIdsByOwner,
                 expectedTransferAmounts2,
                 leftTakerAssetFilledAmount,
-                rightTakerAssetFilledAmount
+                rightTakerAssetFilledAmount,
             );
         });
 
-        
         it('should transfer the correct amounts when consecutive calls are used to completely fill the right order', async () => {
             // Create orders to match
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -536,9 +528,9 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
-            
+
             // Create second left order
             // Note: This order needs makerAssetAmount=96/takerAssetAmount=48 to fully fill the right order.
             //       However, we use 100/50 to ensure a partial fill as we want to go down the "right fill"
@@ -580,33 +572,7 @@ describe.only('matchOrders', () => {
                 rightTakerAssetFilledAmount,
             );
         });
-        
-  /*
-            // Match signedOrderLeft with signedOrderRight
-            const expectedTransferAmounts = {
-                // Left Maker
-                amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
-                amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
-                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 10%
-                // Right Maker
-                amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
-                amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
-                feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 100%
-                // Taker
-                amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 100%
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(), 16), // 50%
-            };
-            await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
-                signedOrderLeft,
-                signedOrderRight,
-                takerAddress,
-                erc20BalancesByOwner,
-                erc721TokenIdsByOwner,
-                expectedTransferAmounts
-            );
 
-        */
         it('should transfer the correct amounts if fee recipient is the same across both matched orders', async () => {
             const feeRecipientAddress = feeRecipientAddressLeft;
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -644,7 +610,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -686,7 +652,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -728,7 +694,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -770,7 +736,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -812,7 +778,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -853,7 +819,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -1022,7 +988,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
 
@@ -1066,7 +1032,7 @@ describe.only('matchOrders', () => {
                 takerAddress,
                 erc20BalancesByOwner,
                 erc721TokenIdsByOwner,
-                expectedTransferAmounts
+                expectedTransferAmounts,
             );
         });
     });
