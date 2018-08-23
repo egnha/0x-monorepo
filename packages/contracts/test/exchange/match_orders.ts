@@ -208,15 +208,15 @@ describe.only('matchOrders', () => {
                 // Left Maker
                 amountSoldByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 0),
                 amountBoughtByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 0),
-                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 18), // 100%
+                feePaidByLeftMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Right Maker
                 amountSoldByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 0),
                 amountBoughtByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 0),
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(75), 16), // 75%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(9), 0),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(1), 18), // 100%
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(5), 17), // 50%
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 16), // 50%
             };
             // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
@@ -257,8 +257,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -298,8 +298,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(0), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
@@ -340,8 +340,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 16), // 50%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 40%
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 16), // 100%
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(50), 16), // 50%
             };
             // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
@@ -382,8 +382,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 100%
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 10%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             // Match signedOrderLeft with signedOrderRight
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
@@ -426,8 +426,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 100%
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(10), 16), // 10%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             // prettier-ignore
             [
@@ -601,8 +601,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -643,8 +643,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -685,8 +685,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -727,8 +727,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -769,8 +769,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -810,8 +810,8 @@ describe.only('matchOrders', () => {
                 feePaidByRightMaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(3), 18),
-                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16),
+                feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
@@ -992,7 +992,7 @@ describe.only('matchOrders', () => {
             );
         });
 
-        it.only('should transfer correct amounts when right order maker asset is an ERC721 token', async () => {
+        it('should transfer correct amounts when right order maker asset is an ERC721 token', async () => {
             // Create orders to match
             const erc721TokenToTransfer = erc721RightMakerAssetIds[0];
             const signedOrderLeft = await orderFactoryLeft.newSignedOrderAsync({
@@ -1024,7 +1024,7 @@ describe.only('matchOrders', () => {
                 // Taker
                 amountReceivedByTaker: Web3Wrapper.toBaseUnitAmount(new BigNumber(2), 18),
                 feePaidByTakerLeft: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
-                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 50%
+                feePaidByTakerRight: Web3Wrapper.toBaseUnitAmount(new BigNumber(100), 16), // 100%
             };
             await matchOrderTester.matchOrdersAndVerifyBalancesAsync(
                 signedOrderLeft,
